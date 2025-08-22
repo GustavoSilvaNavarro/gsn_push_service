@@ -1,7 +1,11 @@
 {
   "cSpell.words": [
+    "evse",
+    "evses",
     "healthcheck",
     "healthz",
-    "isready"
+    "isready",
+    "rabbitmq",
+    "rbtmqc"
   ]
 }
