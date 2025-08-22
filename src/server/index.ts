@@ -5,7 +5,6 @@ import compress from '@fastify/compress';
 import swagger from '@fastify/swagger';
 import swaggerUI from '@fastify/swagger-ui';
 import { customHeadersPlugin } from '@middlewares';
-import { prismaPlugin } from '@plugins';
 import Fastify, { type FastifyBaseLogger } from 'fastify';
 
 import { registerRoutes } from './routers';
@@ -16,9 +15,6 @@ const fastify = Fastify({
 });
 
 export const serverSetup = async () => {
-  // Register plugins
-  fastify.register(prismaPlugin);
-
   fastify.register(compress);
   fastify.register(swagger, { mode: 'static', specification: { document: swaggerDefinition } });
   fastify.register(swaggerUI, {

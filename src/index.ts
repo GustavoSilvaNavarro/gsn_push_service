@@ -15,7 +15,7 @@ process.on('uncaughtException', (err) => {
 process.on('unhandledRejection', (err) => logger.error(err, 'unhandledRejection'));
 
 void (async () => {
-  const { rbtmqc, evseSub } = createConnections();
+  const { rbtmqc, evseSub, db } = await createConnections();
   await startServer();
 
   logger.info(`${NAME} Service started and running`);
@@ -30,7 +30,7 @@ void (async () => {
 
   onExit(() => {
     logger.error(`${NAME} Service is shutting down, closing connections...`);
-    closeConnections({ rbtmqc, evseSub })
+    closeConnections({ rbtmqc, evseSub, db })
       .then(() => process.exit(1))
       .catch((err) => {
         logger.error(`😭 Error closing connections => ${err}`);

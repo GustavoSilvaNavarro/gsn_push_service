@@ -1,4 +1,5 @@
 import { logger } from '@adapters';
+import { connectDb } from '@adapters/db';
 import type { PrismaClient } from '@prisma/client';
 import { Connection } from 'rabbitmq-client';
 
@@ -20,15 +21,17 @@ export const startRabbitMqConnection = () => {
   return rbtmqc;
 };
 
-export const createConnections = (): Connections => {
+export const createConnections = async (): Promise<Connections> => {
   startRabbitMqConnection(); // Nats connection
   const evseSub = startRabbitMqListeners(rbtmqc);
+  const db = await connectDb();
 
-  return { rbtmqc, evseSub };
+  return { rbtmqc, evseSub, db };
 };
 
-export const closeConnections = async ({ evseSub }: Connections) => {
+export const closeConnections = async ({ evseSub, db }: Connections) => {
   logger.warn('😩 Closing RabbitMQ connection');
   await evseSub.shutdown();
   await rbtmqc.close();
+  await db.$disconnect();
 };
