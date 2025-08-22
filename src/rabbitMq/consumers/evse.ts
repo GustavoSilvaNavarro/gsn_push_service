@@ -1,4 +1,5 @@
 import { RABBITMQ_EXCHANGE_NAME, RABBITMQ_QUEUE_NAME } from '@config';
+import type { OcppMessagesEvent } from '@interfaces';
 import type { Connection, Consumer } from 'rabbitmq-client';
 
 export class EvseListener {
@@ -19,6 +20,7 @@ export class EvseListener {
         queueBindings: [{ exchange: RABBITMQ_EXCHANGE_NAME, routingKey: 'evse.*' }],
       },
       (msg) => {
+        const newMsg = msg.body as OcppMessagesEvent;
         console.log('received message (evses)', msg);
       },
     );
