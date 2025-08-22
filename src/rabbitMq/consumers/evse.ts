@@ -1,5 +1,7 @@
+import { logger } from '@adapters';
 import { RABBITMQ_EXCHANGE_NAME, RABBITMQ_QUEUE_NAME } from '@config';
 import type { OcppMessagesEvent } from '@interfaces';
+import { insertNewMsg } from '@services';
 import type { Connection, Consumer } from 'rabbitmq-client';
 
 export class EvseListener {
@@ -19,14 +21,15 @@ export class EvseListener {
         exchanges: [{ exchange: RABBITMQ_EXCHANGE_NAME, type: 'topic' }],
         queueBindings: [{ exchange: RABBITMQ_EXCHANGE_NAME, routingKey: 'evse.*' }],
       },
-      (msg) => {
+      async (msg) => {
         const newMsg = msg.body as OcppMessagesEvent;
-        console.log('received message (evses)', msg);
+        const newEvent = await insertNewMsg(newMsg, msg.routingKey);
+        console.log(newEvent);
       },
     );
 
     this.sub.on('error', (err) => {
-      console.log('consumer error (evse)', err);
+      logger.error(`consumer error (evse) => ${err}`);
     });
   }
 

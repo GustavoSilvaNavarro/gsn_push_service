@@ -8,7 +8,7 @@ export const isARequiredFieldMissing = (data: OcppMessagesEvent): boolean => {
 
 export const insertNewMsg = async (event: OcppMessagesEvent, subject: string) => {
   if (isARequiredFieldMissing(event)) return;
-  const { acn, acc, acg, acs, source, timestamp, payload, cbid, version } = event;
+  const { acn, acc, acg, acs, source, timestamp, payload, cbid } = event;
 
   const newEvent = {
     acnId: acn,
@@ -24,7 +24,6 @@ export const insertNewMsg = async (event: OcppMessagesEvent, subject: string) =>
     source,
     timestamp: new Date(timestamp),
     payload,
-    version,
   };
 
   const newDbMsg = await prisma.messages.create({ data: { ...newEvent } });
