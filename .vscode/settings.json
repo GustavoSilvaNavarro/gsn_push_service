@@ -1,10 +1,16 @@
 {
   "cSpell.words": [
+    "autoincrement",
+    "cbid",
+    "dotenvx",
     "evse",
     "evses",
     "healthcheck",
     "healthz",
     "isready",
+    "measurand",
+    "Ocpp",
+    "pfid",
     "rabbitmq",
     "rbtmqc"
   ]

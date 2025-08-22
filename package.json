@@ -11,7 +11,8 @@
     "check": "npx prettier --check src tests",
     "migration:up": "npx prisma migrate dev",
     "migration:down": "npx prisma migrate reset",
-    "test": "jest -c jest.config.ts"
+    "test": "jest -c jest.config.ts",
+    "test:pub": "ts-node pubTests/index.ts"
   },
   "keywords": [],
   "author": "Gustavo Silva",
@@ -38,6 +39,7 @@
     "@dotenvx/dotenvx": "^1.49.0",
     "@eslint/js": "^9.33.0",
     "@eslint/json": "^0.13.1",
+    "@faker-js/faker": "^9.9.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.3.0",
     "@types/supertest": "^6.0.3",

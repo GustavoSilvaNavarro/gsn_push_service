@@ -4,7 +4,9 @@ import type { Connection } from 'rabbitmq-client';
 import { EvseListener } from './consumers/evse';
 
 export const startRabbitMqListeners = (rbtmqc: Connection) => {
-  new EvseListener(rbtmqc).subscribing();
+  const evseList = new EvseListener(rbtmqc);
+  evseList.subscribing();
 
   logger.info('🚀 RabbitMQs listener has started.');
+  return evseList;
 };

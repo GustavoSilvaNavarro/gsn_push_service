@@ -31,7 +31,7 @@ export class EvseListener {
   async shutdown() {
     if (this.sub) {
       console.log('Closing EVSE consumer…');
-      await this.sub.close(); // 👈 stops consuming
+      await this.sub.close();
     }
   }
 }
