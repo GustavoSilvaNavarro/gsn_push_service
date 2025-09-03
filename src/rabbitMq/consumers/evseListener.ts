@@ -30,17 +30,13 @@ export class EvseListener {
 
         try {
           const body = JSON.parse(msg.content.toString()) as OcppMessagesEvent;
-          throw new Error('Dump error');
           const newEvent = await insertNewMsg(body, msg.fields.routingKey);
           console.log(newEvent);
 
           this.channel.ack(msg); // ✅ manual ack
         } catch (err) {
           logger.error(`consumer error (evse): => ${err as any}`);
-
-          // const retries = (msg.properties.headers['x-retry'] as number | undefined) ?? 0;
           const retries = (msg.properties?.headers?.['x-retry'] as number | undefined) ?? 0;
-          console.log(retries);
 
           if (retries < 5) {
             logger.warn(`Retrying message (attempt ${retries + 1})`);
