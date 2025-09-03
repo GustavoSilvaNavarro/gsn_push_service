@@ -2,6 +2,7 @@
   "cSpell.words": [
     "autoincrement",
     "cbid",
+    "codegen",
     "dotenvx",
     "evse",
     "evses",
@@ -12,6 +13,7 @@
     "Ocpp",
     "pfid",
     "rabbitmq",
+    "rbtconn",
     "rbtmqc"
   ]
 }

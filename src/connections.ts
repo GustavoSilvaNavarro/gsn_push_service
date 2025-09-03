@@ -1,37 +1,45 @@
 import { logger } from '@adapters';
 import { connectDb } from '@adapters/db';
 import type { PrismaClient } from '@prisma/client';
-import { Connection } from 'rabbitmq-client';
+import amqplib, { type ChannelModel } from 'amqplib';
 
+// import { Connection } from 'rabbitmq-client';
 import { RABBITMQ_URL } from './config';
 import { startRabbitMqListeners } from './rabbitMq';
-import type { EvseListener } from './rabbitMq/consumers/evse';
+import type { EvseListener } from './rabbitMq/consumers/evseListener';
 
 type Connections = {
-  rbtmqc: Connection;
+  // rbtmqc: Connection; // modern rabbitMQ
+  rbtmqc: ChannelModel;
   evseSub: EvseListener;
   db: PrismaClient;
 };
 
-let rbtmqc = new Connection(RABBITMQ_URL);
+// let rbtmqc = new Connection(RABBITMQ_URL);
 
-export const startRabbitMqConnection = () => {
-  rbtmqc = new Connection(RABBITMQ_URL);
+// ? Ned RabbitMQ
+// export const startRabbitMqConnection = () => {
+//   rbtmqc = new Connection(RABBITMQ_URL);
 
+//   return rbtmqc;
+// };
+
+export const connectToToRabbitMQ = async () => {
+  const rbtmqc = await amqplib.connect(RABBITMQ_URL);
   return rbtmqc;
 };
 
 export const createConnections = async (): Promise<Connections> => {
-  startRabbitMqConnection(); // Nats connection
-  const evseSub = startRabbitMqListeners(rbtmqc);
+  // startRabbitMqConnection();
+  const rbtConn = await connectToToRabbitMQ();
+  const evseSub = await startRabbitMqListeners(rbtConn);
   const db = await connectDb();
 
-  return { rbtmqc, evseSub, db };
+  return { rbtmqc: rbtConn, evseSub, db };
 };
 
 export const closeConnections = async ({ evseSub, db }: Connections) => {
   logger.warn('😩 Closing RabbitMQ connection');
   await evseSub.shutdown();
-  await rbtmqc.close();
   await db.$disconnect();
 };
