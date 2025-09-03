@@ -30,13 +30,38 @@ export class EvseListener {
 
         try {
           const body = JSON.parse(msg.content.toString()) as OcppMessagesEvent;
+          throw new Error('Dump error');
           const newEvent = await insertNewMsg(body, msg.fields.routingKey);
           console.log(newEvent);
 
           this.channel.ack(msg); // ✅ manual ack
         } catch (err) {
           logger.error(`consumer error (evse): => ${err as any}`);
-          this.channel.nack(msg, false, true); // ❌ nack + requeue
+
+          // const retries = (msg.properties.headers['x-retry'] as number | undefined) ?? 0;
+          const retries = (msg.properties?.headers?.['x-retry'] as number | undefined) ?? 0;
+          console.log(retries);
+
+          if (retries < 5) {
+            logger.warn(`Retrying message (attempt ${retries + 1})`);
+
+            // Re-publish the message to the same exchange/queue
+            this.channel.publish(msg.fields.exchange, msg.fields.routingKey, msg.content, {
+              headers: { ...msg.properties.headers, 'x-retry': retries + 1 },
+              persistent: true,
+            });
+          } else {
+            logger.error('Message failed after 5 retries, sending to DLQ');
+
+            this.channel.publish(
+              'evse.dlx', // Dead-letter exchange
+              'dlq', // Routing key for DLQ
+              msg.content,
+              { headers: { ...msg.properties.headers, 'x-retry': retries }, persistent: true },
+            );
+          }
+
+          this.channel.ack(msg); // Ack original to avoid infinite loop
         }
       },
       { noAck: false },
