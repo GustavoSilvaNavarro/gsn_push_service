@@ -11,3 +11,8 @@ export const LOG_LEVEL: LOG_LEVELS = (process.env.LOG_LEVEL as LOG_LEVELS) || EN
 export const PORT = +(process.env.PORT ?? 8080);
 export const URL_PREFIX = ENVIRONMENT === 'local' || ENVIRONMENT === 'test' ? 'api' : 'gsn_push_service';
 export const API_URL = process.env.API_URL ?? 'http://localhost:8080';
+
+// ! RabbitMq
+export const RABBITMQ_URL = process.env.RABBITMQ_URL ?? 'amqp://localhost';
+export const RABBITMQ_EXCHANGE_NAME = process.env.RABBITMQ_EXCHANGE_NAME ?? 'push-events';
+export const RABBITMQ_QUEUE_NAME = process.env.RABBITMQ_QUEUE_NAME ?? 'evses';

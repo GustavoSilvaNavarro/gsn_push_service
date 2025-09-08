@@ -95,7 +95,7 @@ commit-prefix:
 
 # External services
 run-external-services:
-	docker compose -f ./docker-compose.inf.yml up -d db
+	docker compose -f ./docker-compose.inf.yml up -d db rabbitmq
 
 # Docker commands
 build-base:

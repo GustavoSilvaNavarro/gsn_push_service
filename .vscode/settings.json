@@ -1,7 +1,19 @@
 {
   "cSpell.words": [
+    "autoincrement",
+    "cbid",
+    "codegen",
+    "dotenvx",
+    "evse",
+    "evses",
     "healthcheck",
     "healthz",
-    "isready"
+    "isready",
+    "measurand",
+    "Ocpp",
+    "pfid",
+    "rabbitmq",
+    "rbtconn",
+    "rbtmqc"
   ]
 }
