@@ -21,11 +21,11 @@ void (async () => {
   logger.info(`${NAME} Service started and running`);
 
   rbtmqc.on('error', (err) => {
-    console.log('RabbitMQ connection error', err);
+    logger.error(err, 'RabbitMQ connection error');
   });
 
   rbtmqc.on('connection', () => {
-    console.log('🔥 Connection successfully (re)established');
+    logger.error('🔥 Connection successfully (re)established');
   });
 
   onExit(() => {
@@ -33,7 +33,7 @@ void (async () => {
     closeConnections({ rbtmqc, evseSub, db })
       .then(() => process.exit(1))
       .catch((err) => {
-        logger.error(`😭 Error closing connections => ${err}`);
+        logger.error(err, '😭 Error closing connections');
         process.exit(1);
       });
   });

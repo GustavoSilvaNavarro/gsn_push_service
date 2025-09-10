@@ -1,8 +1,8 @@
 import { logger } from '@adapters';
 import type { ChannelModel } from 'amqplib';
 
-import { EvseListener } from './consumers/evseListener';
-import { setupDLQ } from './dlq';
+import { setupDLQ } from './consumers/amqp/dlq';
+import { EvseListener } from './consumers/amqp/evseListener';
 // import type { Connection } from 'rabbitmq-client';
 
 // import { EvseListener } from './consumers/evse';

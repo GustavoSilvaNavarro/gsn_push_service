@@ -17,7 +17,11 @@ export class EvseListener {
     this.channel = await this.rbtconn.createChannel();
 
     await this.channel.assertExchange(RABBITMQ_EXCHANGE_NAME, 'topic', { durable: true });
-    await this.channel.assertQueue(RABBITMQ_QUEUE_NAME, { durable: true });
+    await this.channel.assertQueue(RABBITMQ_QUEUE_NAME, {
+      durable: true,
+      deadLetterExchange: 'evse.dlx',
+      deadLetterRoutingKey: 'dlq',
+    }); // configuring automatic dlq
     await this.channel.bindQueue(RABBITMQ_QUEUE_NAME, RABBITMQ_EXCHANGE_NAME, 'evse.*');
 
     await this.channel.prefetch(2);
@@ -31,11 +35,11 @@ export class EvseListener {
         try {
           const body = JSON.parse(msg.content.toString()) as OcppMessagesEvent;
           const newEvent = await insertNewMsg(body, msg.fields.routingKey);
-          console.log(newEvent);
+          logger.info(newEvent);
 
-          this.channel.ack(msg); // ✅ manual ack
+          this.channel.ack(msg);
         } catch (err) {
-          logger.error(`consumer error (evse): => ${err as any}`);
+          logger.error(err, 'Consumer error');
           const retries = (msg.properties?.headers?.['x-retry'] as number | undefined) ?? 0;
 
           if (retries < 5) {
@@ -46,18 +50,12 @@ export class EvseListener {
               headers: { ...msg.properties.headers, 'x-retry': retries + 1 },
               persistent: true,
             });
+
+            this.channel.ack(msg);
           } else {
-            logger.error('Message failed after 5 retries, sending to DLQ');
-
-            this.channel.publish(
-              'evse.dlx', // Dead-letter exchange
-              'dlq', // Routing key for DLQ
-              msg.content,
-              { headers: { ...msg.properties.headers, 'x-retry': retries }, persistent: true },
-            );
+            logger.warn('Message failed after 5 retries, sending to DLQ');
+            this.channel.nack(msg, false, false);
           }
-
-          this.channel.ack(msg); // Ack original to avoid infinite loop
         }
       },
       { noAck: false },

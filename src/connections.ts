@@ -6,7 +6,7 @@ import amqplib, { type ChannelModel } from 'amqplib';
 // import { Connection } from 'rabbitmq-client';
 import { RABBITMQ_URL } from './config';
 import { startRabbitMqListeners } from './rabbitMq';
-import type { EvseListener } from './rabbitMq/consumers/evseListener';
+import type { EvseListener } from './rabbitMq/consumers/amqp/evseListener';
 
 type Connections = {
   // rbtmqc: Connection; // modern rabbitMQ
